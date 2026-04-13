@@ -3,8 +3,8 @@ import { useState, useRef } from "react";
 // ============================================================
 // 🔑 STRIPE CONFIGURATION — PASTE YOUR KEYS HERE
 // ============================================================
-const STRIPE_PUBLISHABLE_KEY = "pk_live_XXXXXXXXXXXXXXXXXXXXXXXX"; // Your Stripe publishable key
-const STRIPE_PRICE_ID = "price_XXXXXXXXXXXXXXXXXXXXXXXX";          // Your Stripe Price ID (monthly sub)
+const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_KEY; // Your Stripe publishable key
+const STRIPE_PRICE_ID = import.meta.env.VITE_STRIPE_PRICE_ID;          // Your Stripe Price ID (monthly sub)
 // ============================================================
 
 const PLANS = [
