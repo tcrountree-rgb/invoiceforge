@@ -54,28 +54,23 @@ export default function InvoiceGenerator() {
 
   const handleDownload = () => { isPro ? window.print() : setShowPaywall(true); };
 
-  const handleStripeCheckout = async () => {
-    setStripeLoading(true);
-    setStripeError("");
-    try {
-      const stripeScript = document.createElement("script");
-      stripeScript.src = "https://js.stripe.com/v3/";
-      document.head.appendChild(stripeScript);
-      await new Promise((res) => { stripeScript.onload = res; });
-      const stripe = window.Stripe(STRIPE_PUBLISHABLE_KEY);
-      const { error } = await stripe.redirectToCheckout({
-        lineItems: [{ price: STRIPE_PRICE_ID, quantity: 1 }],
-        mode: "subscription",
-        successUrl: window.location.href + "?subscribed=true",
-        cancelUrl: window.location.href,
-        customerEmail: from.email || undefined,
-      });
-      if (error) throw new Error(error.message);
-    } catch (err) {
-      setStripeError(err.message || "Something went wrong. Please try again.");
-    }
-    setStripeLoading(false);
-  };
+const handleStripeCheckout = async () => {
+  setStripeLoading(true);
+  setStripeError("");
+  try {
+    const response = await fetch('/api/create-checkout-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: from.email || '' }),
+    });
+    const data = await response.json();
+    if (data.error) throw new Error(data.error);
+    window.location.href = data.url;
+  } catch (err) {
+    setStripeError(err.message || "Something went wrong. Please try again.");
+  }
+  setStripeLoading(false);
+};
 
   return (
     <div style={{ fontFamily: "sans-serif", minHeight: "100vh", background: "#f5f0eb" }}>
