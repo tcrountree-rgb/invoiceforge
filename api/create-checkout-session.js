@@ -7,12 +7,18 @@ module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   try {
+    const priceId = process.env.STRIPE_PRICE_ID;
+    
+    if (!priceId) {
+      throw new Error('Price ID not configured: ' + JSON.stringify(Object.keys(process.env)));
+    }
+
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
-      line_items: [{ price: process.env.STRIPE_PRICE_ID, quantity: 1 }],
+      line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${req.headers.origin}?subscribed=true`,
       cancel_url: req.headers.origin,
-      customer_email: req.body.email || undefined,
+      customer_email: req.body?.email || undefined,
     });
     res.json({ url: session.url });
   } catch (err) {
